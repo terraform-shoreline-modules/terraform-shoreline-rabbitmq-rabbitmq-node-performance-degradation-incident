@@ -1,0 +1,154 @@
+{
+  "name": "rabbitmq_node_performance_degradation_incident",
+  "description": "RabbitMQ is a popular open-source message broker that facilitates communication between distributed systems. This incident type refers to instances where a RabbitMQ node experiences performance degradation, meaning that the node is not functioning optimally and may be causing delays or other issues for the applications relying on it. This can have significant impacts on system availability and reliability, particularly if the degraded node is a critical component of the overall architecture. Addressing this incident type requires identifying the root cause of the degradation and implementing appropriate remediation measures.",
+  "params": [
+    {
+      "name": "RAM_ALLOCATION",
+      "value": ""
+    },
+    {
+      "name": "RABBITMQ_NODE",
+      "value": ""
+    },
+    {
+      "name": "DISK_SPACE_ALLOCATION",
+      "value": ""
+    },
+    {
+      "name": "NODE_NAME",
+      "value": ""
+    },
+    {
+      "name": "CPU_ALLOCATION",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## RabbitMQ Node Performance Degradation Incident\nRabbitMQ is a popular open-source message broker that facilitates communication between distributed systems. This incident type refers to instances where a RabbitMQ node experiences performance degradation, meaning that the node is not functioning optimally and may be causing delays or other issues for the applications relying on it. This can have significant impacts on system availability and reliability, particularly if the degraded node is a critical component of the overall architecture. Addressing this incident type requires identifying the root cause of the degradation and implementing appropriate remediation measures."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 1. Check RabbitMQ status"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo rabbitmqctl status`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 2. Check if RabbitMQ is running on all nodes"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo rabbitmqctl cluster_status`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 3. Check RabbitMQ log files for any errors"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo tail -f /var/log/rabbitmq/rabbit*.log`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 4. Check system resource usage"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `top`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 5. Check network connectivity"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ping ${RABBITMQ_NODE}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 6. Check for any blocked connections"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo rabbitmqctl list_connections name blocked`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 7. Check for any blocked channels"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo rabbitmqctl list_channels name connections_blocked`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 8. Check for any queues with high resource usage"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo rabbitmqctl list_queues name messages consumers memory state`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the resources allocated to the RabbitMQ node(s) affected by the incident, such as CPU, RAM, or disk space, to improve its performance."
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_rabbitmq_update_node($RAM_ALLOCATION, $DISK_SPACE_ALLOCATION, $NODE_NAME, $CPU_ALLOCATION)"
+    }
+  ]
+}
